@@ -7,11 +7,12 @@ import Form from "react-bootstrap/Form";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 
-import { auth } from "../../config";
+import { auth,  googleProvider } from "../../config";
 
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
 } from "firebase/auth";
 
 const Auth = () => {
@@ -44,14 +45,14 @@ const Auth = () => {
         const result = await signInWithEmailAndPassword(
           auth,
           authData.email,
-          authData.password
+          authData.password,
         );
         setUser(result.user.email);
       } else {
         const result = await createUserWithEmailAndPassword(
           auth,
           authData.email,
-          authData.password
+          authData.password,
         );
         setUser(result.user.email);
       }
@@ -62,9 +63,18 @@ const Auth = () => {
     }
   };
 
-  const googleProvider = async () => {
-    
-  }
+  const handleGoogleLogin  = async () => {
+    setLoading(true);
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+
+      setUser(result.user.email);
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -105,7 +115,7 @@ const Auth = () => {
                   {isLogin ? "login" : "sign up"}
                 </Button>
 
-                <Button disabled={loading} onClick={googleProvider}>
+                 <Button onClick={handleGoogleLogin} disabled={loading} className="mt-3 btn-warning" >
                   Login With Google
                 </Button>
 
